@@ -373,7 +373,7 @@ function renderAll() {
       <div class="card-actions">
         <button class="card-btn" onclick="openDetail('${r.id}')">👁 View</button>
         <button class="card-btn" onclick="startEdit('${r.id}')">✏️ Edit</button>
-        <button class="card-btn" onclick="${r.url?`window.open('${r.url}','_blank')`:'toast(\"No link saved\")'}"  >🔗 Open</button>
+        <button class="card-btn" onclick="${r.url?`window.open('${r.url}','_blank')`:`toast('No link saved')`}">🔗 Open</button>
         <button class="card-btn danger" onclick="startSelectForDelete('${r.id}')">🗑</button>
       </div>
     </div>`;
