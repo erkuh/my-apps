@@ -133,7 +133,7 @@ select option{background:#fff;}
 /* DETAIL PANEL */
 .detail-thumb{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-bottom:16px;display:none;}
 .detail-section-title{font-size:13px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
-.detail-text{font-size:15px;line-height:1.7;color:var(--ink);white-space:pre-wrap;}
+.detail-text{font-size:15px;line-height:1.7;color:var(--ink);white-space:pre-wrap;margin-bottom:14px;}
 .detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
 .detail-actions{display:flex;gap:10px;margin-top:20px;}
 .btn-detail{flex:1;padding:13px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;border:none;}
@@ -259,18 +259,22 @@ select option{background:#fff;}
     <div class="panel-title" id="detailName" style="margin-top:8px;"></div>
     <div class="detail-tags" id="detailTags"></div>
     <div id="detailUrl" style="margin-bottom:16px;"></div>
+    
     <div id="detailIngSection" style="display:none;margin-bottom:16px;">
       <div class="detail-section-title">Ingredients</div>
       <div class="detail-text" id="detailIngredients"></div>
     </div>
+    
     <div id="detailInstSection" style="display:none;margin-bottom:16px;">
       <div class="detail-section-title">Instructions</div>
       <div class="detail-text" id="detailInstructions"></div>
     </div>
+    
     <div id="detailNotesSection" style="display:none;margin-bottom:16px;">
       <div class="detail-section-title">Notes</div>
       <div class="detail-text" id="detailNotes"></div>
     </div>
+    
     <div class="detail-actions">
       <button class="btn-detail btn-close-detail" onclick="closeDetailPanel()">Close</button>
       <button class="btn-detail btn-edit" onclick="editCurrentRecipe()">Edit</button>
@@ -600,9 +604,38 @@ function openDetail(id) {
   const ing = document.getElementById('detailIngSection');
   const inst = document.getElementById('detailInstSection');
   const notes = document.getElementById('detailNotesSection');
-  if (r.ingredients) { ing.style.display='block'; document.getElementById('detailIngredients').textContent = r.ingredients; } else { ing.style.display='none'; }
-  if (r.instructions) { inst.style.display='block'; document.getElementById('detailInstructions').textContent = r.instructions; } else { inst.style.display='none'; }
-  if (r.notes) { notes.style.display='block'; document.getElementById('detailNotes').textContent = r.notes; } else { notes.style.display='none'; }
+  
+  // Format helpers to respect raw line breaks and automatically format nice lists
+  if (r.ingredients) { 
+    ing.style.display='block'; 
+    document.getElementById('detailIngredients').innerHTML = r.ingredients
+      .split('\n')
+      .map(line => line.trim() ? `<div style="margin-bottom: 4px;">• ${line}</div>` : '')
+      .join('');
+  } else { ing.style.display='none'; }
+  
+  if (r.instructions) { 
+    inst.style.display='block'; 
+    let stepNum = 1;
+    document.getElementById('detailInstructions').innerHTML = r.instructions
+      .split('\n')
+      .map(line => {
+        let cleaned = line.trim();
+        if (!cleaned) return '';
+        // Strip out existing digits/dots at the start of the line so we don't double-number it
+        cleaned = cleaned.replace(/^\d+[\s\.\,\-\)]+/, '');
+        return `<div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start;">
+                  <span style="background: var(--orange-mid); color: var(--orange); font-weight: 700; font-size: 12px; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">${stepNum++}</span>
+                  <span style="flex: 1; padding-top: 2px;">${cleaned}</span>
+                </div>`;
+      })
+      .join('');
+  } else { inst.style.display='none'; }
+  
+  if (r.notes) { 
+    notes.style.display='block'; 
+    document.getElementById('detailNotes').textContent = r.notes; 
+  } else { notes.style.display='none'; }
 
   document.getElementById('detailOverlay').classList.add('open');
 }
