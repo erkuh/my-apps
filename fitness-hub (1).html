@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitHub</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0F0F0F; --card: #1A1A1A; --card2: #222; --border: #2E2E2E;
+  --accent: #C6F135; --accent-dim: rgba(198,241,53,0.12);
+  --text: #F5F5F5; --muted: #888;
+  --red: #FF5252; --blue: #4A9EFF; --pink: #FF4B8B;
+  --tennis: #FFD700; --tennis-dim: rgba(255,215,0,0.12);
+  --star: #FFD700;
+}
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: 85px; }
+
+header { display:flex; align-items:center; justify-content:space-between; padding:18px 18px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:10; }
+.logo { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+.logo span { color:var(--accent); }
+.logo .tennis-dot { color:var(--tennis); }
+.header-date { font-size:13px; color:var(--muted); font-weight:500; }
+
+nav { position:fixed; bottom:0; left:0; right:0; background:#111; border-top:1px solid var(--border); display:flex; z-index:100; }
+.nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:10px 4px; border:none; background:none; color:var(--muted); font-size:10px; font-weight:600; letter-spacing:0.3px; cursor:pointer; transition:color 0.2s; }
+.nav-btn svg { width:20px; height:20px; }
+.nav-btn.active { color:var(--accent); }
+.nav-btn.tennis-tab.active { color:var(--tennis); }
+.nav-btn.fav-tab.active { color:var(--star); }
+
+.page { display:none; padding:0 15px; }
+.page.active { display:block; }
+
+.section-header { display:flex; align-items:center; justify-content:space-between; padding:18px 0 12px; }
+.section-title { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+.section-subtitle { font-size:13px; color:var(--muted); margin-top:2px; }
+
+.btn-add { background:var(--accent); color:#000; border:none; border-radius:20px; padding:8px 15px; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; transition:opacity 0.15s; }
+.btn-add:hover { opacity:0.85; }
+.btn-add.tennis { background:var(--tennis); }
+
+/* BULK DELETE BAR */
+.bulk-bar { display:none; position:sticky; top:57px; z-index:9; background:#1C1C1C; border:1px solid var(--border); border-radius:14px; padding:11px 15px; margin-bottom:12px; flex-direction:row; align-items:center; justify-content:space-between; }
+.bulk-bar.visible { display:flex; }
+.bulk-count { font-size:14px; font-weight:700; color:var(--text); }
+.bulk-actions { display:flex; gap:8px; }
+.btn-bulk-cancel { background:var(--card2); border:1px solid var(--border); color:var(--muted); border-radius:10px; padding:7px 13px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-bulk-delete { background:var(--red); color:#fff; border:none; border-radius:10px; padding:7px 13px; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* OVERLAY / MODAL */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:200; align-items:flex-end; justify-content:center; }
+.overlay.open { display:flex; }
+.modal { background:#1C1C1C; border-radius:24px 24px 0 0; padding:22px 18px 36px; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; animation:slideUp 0.28s ease; }
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 18px; }
+.modal-title { font-size:18px; font-weight:800; margin-bottom:18px; }
+
+label { display:block; font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:7px; }
+input[type="text"], input[type="url"], textarea, select { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:15px; padding:12px 14px; margin-bottom:14px; outline:none; font-family:inherit; transition:border-color 0.2s; }
+input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+textarea { resize:vertical; min-height:75px; }
+select option { background:#222; }
+.form-group { margin-bottom:14px; }
+.form-group label { margin-bottom:7px; }
+.form-group input, .form-group select, .form-group textarea { margin-bottom:0; }
+
+.btn-row { display:flex; gap:10px; margin-top:6px; }
+.btn-cancel { flex:1; background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:13px; font-size:15px; font-weight:600; cursor:pointer; }
+.btn-save { flex:2; background:var(--accent); color:#000; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:800; cursor:pointer; }
+.btn-save.tennis { background:var(--tennis); }
+
+/* PLATFORM BADGE */
+.platform-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; letter-spacing:0.4px; text-transform:uppercase; }
+.badge-instagram { background:rgba(255,75,139,0.15); color:var(--pink); }
+.badge-tiktok { background:rgba(255,255,255,0.1); color:#fff; }
+.badge-youtube { background:rgba(255,82,82,0.15); color:var(--red); }
+.badge-twitter { background:rgba(74,158,255,0.15); color:var(--blue); }
+.badge-facebook { background:rgba(74,158,255,0.15); color:var(--blue); }
+.badge-other { background:rgba(198,241,53,0.12); color:var(--accent); }
+
+/* VIDEO CARDS */
+.video-card { background:var(--card); border:1px solid var(--border); border-radius:18px; margin-bottom:12px; overflow:hidden; transition:transform 0.15s; position:relative; }
+.video-card.selected-card { border-color:var(--red); background:#1f1515; }
+.video-card.tennis-card { border-color:#2a2500; }
+.video-card.tennis-card.selected-card { border-color:var(--tennis); background:#1f1d00; }
+
+.video-card-top { padding:14px; display:flex; align-items:flex-start; gap:11px; }
+.video-checkbox { width:22px; height:22px; border:2px solid var(--border); border-radius:6px; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-top:2px; transition:all 0.15s; display:none; }
+.select-mode .video-checkbox { display:flex; }
+.video-checkbox.checked { background:var(--red); border-color:var(--red); }
+.tennis-select-mode .video-checkbox { display:flex; }
+
+.video-thumbnail { width:64px; height:64px; border-radius:12px; background:var(--card2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:26px; }
+.video-info { flex:1; min-width:0; }
+.video-title { font-size:15px; font-weight:700; margin-bottom:5px; line-height:1.3; }
+.video-meta { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.video-cat { font-size:12px; color:var(--muted); }
+
+.video-card-actions { display:flex; border-top:1px solid var(--border); }
+.card-action-btn { flex:1; background:none; border:none; color:var(--muted); font-size:12px; font-weight:600; padding:11px 6px; cursor:pointer; transition:color 0.15s; display:flex; align-items:center; justify-content:center; gap:5px; }
+.card-action-btn:hover { color:var(--accent); }
+.card-action-btn + .card-action-btn { border-left:1px solid var(--border); }
+.card-action-btn.fav-btn.active { color:var(--star); }
+.card-action-btn.fav-btn.active:hover { color:var(--star); }
+
+/* STAR ICON */
+.star-icon { font-size:14px; }
+
+/* FILTER PILLS */
+.filter-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:12px; scrollbar-width:none; }
+.filter-row::-webkit-scrollbar { display:none; }
+.filter-pill { background:var(--card); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:6px 13px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; flex-shrink:0; }
+.filter-pill.active { background:var(--accent); border-color:var(--accent); color:#000; }
+.filter-pill.tennis-pill.active { background:var(--tennis); border-color:var(--tennis); color:#000; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:55px 20px; color:var(--muted); }
+.empty-icon { font-size:46px; margin-bottom:12px; }
+.empty-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.empty-sub { font-size:14px; line-height:1.5; }
+
+/* SEARCH */
+.search-wrap { position:relative; margin-bottom:12px; }
+.search-wrap input { padding-left:38px; margin-bottom:0; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+
+/* STATS */
+.stats-row { display:flex; gap:9px; margin-bottom:4px; }
+.stat-card { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 10px; text-align:center; }
+.stat-num { font-size:24px; font-weight:900; color:var(--accent); line-height:1; }
+.stat-label { font-size:11px; color:var(--muted); font-weight:600; margin-top:4px; }
+
+.progress-wrap { margin-bottom:18px; margin-top:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:7px; }
+.progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--accent); border-radius:3px; transition:width 0.4s ease; }
+
+/* ROUTINE CARDS */
+.day-section { margin-bottom:22px; }
+.day-label { font-size:12px; font-weight:800; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+.day-label.tennis-label { color:var(--tennis); }
+.day-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.routine-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:9px; display:flex; gap:12px; align-items:flex-start; }
+.routine-check { width:22px; height:22px; border:2px solid var(--border); border-radius:50%; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-top:2px; transition:all 0.15s; }
+.routine-check.done { background:var(--accent); border-color:var(--accent); }
+.routine-info { flex:1; min-width:0; }
+.routine-name { font-size:15px; font-weight:700; margin-bottom:4px; }
+.routine-name.done { text-decoration:line-through; color:var(--muted); }
+.routine-details { font-size:12px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; }
+.routine-actions { display:flex; gap:7px; margin-top:9px; }
+.btn-sm { background:var(--card2); border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+.btn-sm:hover { color:var(--accent); border-color:var(--accent); }
+.btn-sm.danger:hover { color:var(--red); border-color:var(--red); }
+
+/* DAY PILLS */
+.day-pills { display:flex; gap:6px; flex-wrap:wrap; }
+.day-pill { background:var(--card2); border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:6px 10px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+.day-pill.active { background:var(--accent); border-color:var(--accent); color:#000; }
+
+/* VIDEO SELECT IN MODAL */
+.video-select-item { display:flex; align-items:center; gap:9px; padding:9px; border-radius:10px; border:1px solid var(--border); margin-bottom:7px; cursor:pointer; transition:border-color 0.15s; }
+.video-select-item.selected { border-color:var(--accent); background:var(--accent-dim); }
+.video-select-thumb { width:38px; height:38px; border-radius:8px; background:var(--card2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.video-select-name { font-size:13px; font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* SETS ROW */
+.sets-row { display:flex; gap:9px; }
+.sets-row > div { flex:1; }
+
+/* TENNIS SECTION HEADER */
+.tennis-header { background:linear-gradient(135deg, #1a1500, #0f0f0f); border:1px solid #3a3000; border-radius:16px; padding:16px; margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+.tennis-icon { font-size:32px; }
+.tennis-header-text { }
+.tennis-header-title { font-size:16px; font-weight:800; color:var(--tennis); }
+.tennis-header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* FAVOURITES */
+.fav-section { margin-bottom:24px; }
+.fav-section-label { font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.fav-section-label.fitness-fav { color:var(--accent); }
+.fav-section-label.tennis-fav { color:var(--tennis); }
+.fav-section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* VIDEO VIEWER */
+.video-viewer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:300; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+.video-viewer-overlay.open { display:flex; }
+.viewer-close { position:absolute; top:18px; right:18px; background:var(--card2); border:1px solid var(--border); color:var(--text); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.viewer-title { font-size:16px; font-weight:700; margin-bottom:14px; text-align:center; max-width:500px; }
+.viewer-frame { width:100%; max-width:560px; background:var(--card); border-radius:16px; overflow:hidden; aspect-ratio:9/16; max-height:68vh; }
+.viewer-frame iframe { width:100%; height:100%; border:none; }
+.viewer-link-btn { margin-top:14px; background:var(--accent); color:#000; border:none; border-radius:12px; padding:11px 22px; font-size:14px; font-weight:800; cursor:pointer; text-decoration:none; display:inline-block; }
+
+/* TOAST */
+.toast { position:fixed; bottom:92px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--accent); color:#000; padding:9px 18px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:all 0.3s; z-index:500; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Fit<span>Hub</span></div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<!-- PAGES -->
+<div class="page active" id="page-today">
+  <div class="section-header"><div><div class="section-title">Today's Workout</div></div></div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statDone">0</div><div class="stat-label">Done</div></div>
+    <div class="stat-card"><div class="stat-num" id="statLeft">0</div><div class="stat-label">Left</div></div>
+    <div class="stat-card"><div class="stat-num" id="statVideos">0</div><div class="stat-label">Videos</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Progress</span><span id="progressPct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div id="todayList"></div>
+</div>
+
+<div class="page" id="page-videos">
+  <div class="section-header">
+    <div class="section-title">Fitness Videos</div>
+    <button class="btn-add" onclick="openVideoModal('fitness')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+    </button>
+  </div>
+  <div class="bulk-bar" id="fitnessBulkBar">
+    <span class="bulk-count" id="fitnessBulkCount">0 selected</span>
+    <div class="bulk-actions">
+      <button class="btn-bulk-cancel" onclick="cancelSelectMode('fitness')">Cancel</button>
+      <button class="btn-bulk-delete" onclick="bulkDelete('fitness')">🗑 Delete</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    <input type="text" placeholder="Search fitness videos..." id="fitnessSearch" oninput="renderVideos('fitness')">
+  </div>
+  <div class="filter-row" id="fitnessFilters"></div>
+  <div id="fitnessVideoList"></div>
+</div>
+
+<div class="page" id="page-tennis">
+  <div class="tennis-header">
+    <div class="tennis-icon">🎾</div>
+    <div class="tennis-header-text">
+      <div class="tennis-header-title">Tennis Hub</div>
+      <div class="tennis-header-sub">Videos, drills & practice tips</div>
+    </div>
+    <button class="btn-add tennis" style="margin-left:auto;" onclick="openVideoModal('tennis')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+    </button>
+  </div>
+  <div class="bulk-bar" id="tennisBulkBar">
+    <span class="bulk-count" id="tennisBulkCount">0 selected</span>
+    <div class="bulk-actions">
+      <button class="btn-bulk-cancel" onclick="cancelSelectMode('tennis')">Cancel</button>
+      <button class="btn-bulk-delete" onclick="bulkDelete('tennis')">🗑 Delete</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    <input type="text" placeholder="Search tennis videos..." id="tennisSearch" oninput="renderVideos('tennis')">
+  </div>
+  <div class="filter-row" id="tennisFilters"></div>
+  <div id="tennisVideoList"></div>
+</div>
+
+<div class="page" id="page-routines">
+  <div class="section-header">
+    <div class="section-title">My Routines</div>
+    <button class="btn-add" onclick="openRoutineModal()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+    </button>
+  </div>
+  <div id="routineList"></div>
+</div>
+
+<div class="page" id="page-favourites">
+  <div class="section-header"><div class="section-title">⭐ Favourites</div></div>
+  <div id="favouritesList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav>
+  <button class="nav-btn active" onclick="switchPage('today',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Today
+  </button>
+  <button class="nav-btn" onclick="switchPage('videos',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="15" height="10" rx="2"/><polygon points="17,9 22,12 17,15"/></svg>Fitness
+  </button>
+  <button class="nav-btn tennis-tab" onclick="switchPage('tennis',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M5.5 5.5c3 3 3 10 0 13M18.5 5.5c-3 3-3 10 0 13"/></svg>Tennis
+  </button>
+  <button class="nav-btn" onclick="switchPage('routines',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12h12M6 6h12M6 18h8"/></svg>Routines
+  </button>
+  <button class="nav-btn fav-tab" onclick="switchPage('favourites',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Saved
+  </button>
+</nav>
+
+<!-- ADD VIDEO MODAL -->
+<div class="overlay" id="videoModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="videoModalTitle">Add Video</div>
+    <input type="hidden" id="vType" value="fitness">
+    <div class="form-group"><label>Title</label><input type="text" id="vTitle" placeholder="e.g. 10-Min Core Blast"></div>
+    <div class="form-group">
+      <label>Social Media Link</label>
+      <input type="url" id="vUrl" placeholder="Paste Instagram, TikTok, YouTube URL..." oninput="detectPlatform()">
+      <div id="platformDetected" style="margin-top:6px; font-size:12px; color:var(--accent);"></div>
+    </div>
+    <div class="form-group"><label>Category</label><select id="vCat"></select></div>
+    <div class="form-group"><label>Notes (optional)</label><textarea id="vNotes" placeholder="Tips, modifications, reminders..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeVideoModal()">Cancel</button>
+      <button class="btn-save" id="videoSaveBtn" onclick="saveVideo()">Save Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ROUTINE MODAL -->
+<div class="overlay" id="routineModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="routineModalTitle">Add Exercise</div>
+    <div class="form-group"><label>Exercise Name</label><input type="text" id="rName" placeholder="e.g. Push-ups, Squats, Plank"></div>
+    <div class="form-group"><label>Day(s)</label><div class="day-pills" id="dayPills"></div></div>
+    <div class="form-group" style="margin-top:12px;">
+      <label>Sets & Reps / Duration</label>
+      <div class="sets-row">
+        <div><input type="text" id="rSets" placeholder="Sets (e.g. 3)"></div>
+        <div><input type="text" id="rReps" placeholder="Reps or Duration"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Link a Video (optional)</label>
+      <div id="videoSelectList"></div>
+      <div id="noVideosMsg" style="font-size:13px;color:var(--muted);display:none;">No videos saved yet.</div>
+    </div>
+    <div class="form-group"><label>Notes (optional)</label><textarea id="rNotes" placeholder="Rest time, weight, tips..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeRoutineModal()">Cancel</button>
+      <button class="btn-save" onclick="saveRoutine()">Save Exercise</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO VIEWER -->
+<div class="video-viewer-overlay" id="videoViewer">
+  <button class="viewer-close" onclick="closeViewer()">✕</button>
+  <div class="viewer-title" id="viewerTitle"></div>
+  <div class="viewer-frame" id="viewerFrame"></div>
+  <a class="viewer-link-btn" id="viewerLink" target="_blank" rel="noopener">Open Original ↗</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const FITNESS_CATS = ['General','Warm Up','Stretches & Cool Down','Strength','Cardio','HIIT','Core','Upper Body','Lower Body','Legs & Glutes','Flexibility','Yoga','Pilates'];
+const TENNIS_CATS = ['General','Footwork','Forehand','Backhand','Serve','Volley','Return','Strategy & Tips','Fitness for Tennis','Drills','Mental Game'];
+
+let state = {
+  fitnessVideos: [], tennisVideos: [], routines: [],
+  completedToday: {}, lastDate: null,
+  activeFitnessFilter: 'All', activeTennisFilter: 'All',
+  fitnessSelectMode: false, tennisSelectMode: false,
+  fitnessSelected: [], tennisSelected: [],
+  selectedRoutineVideo: null, selectedDays: [],
+  editVideoId: null, editVideoType: null, editRoutineId: null
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('fithub2_state');
+    if (s) { const p = JSON.parse(s); state = {...state, ...p}; state.fitnessSelected=[]; state.tennisSelected=[]; state.fitnessSelectMode=false; state.tennisSelectMode=false; }
+    const today = new Date().toDateString();
+    if (state.lastDate !== today) { state.completedToday = {}; state.lastDate = today; saveState(); }
+  } catch(e) {}
+}
+
+function saveState() { localStorage.setItem('fithub2_state', JSON.stringify(state)); }
+
+function getPlatform(url) {
+  if (!url) return 'other'; const u = url.toLowerCase();
+  if (u.includes('instagram.com')) return 'instagram';
+  if (u.includes('tiktok.com')) return 'tiktok';
+  if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+  if (u.includes('twitter.com') || u.includes('x.com')) return 'twitter';
+  if (u.includes('facebook.com')) return 'facebook';
+  return 'other';
+}
+function getPlatformLabel(p) { return {instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',twitter:'Twitter/X',facebook:'Facebook',other:'Web'}[p]||'Web'; }
+function getPlatformEmoji(p) { return {instagram:'📸',tiktok:'🎵',youtube:'▶️',twitter:'🐦',facebook:'👤',other:'🔗'}[p]||'🔗'; }
+function getEmbedUrl(url) {
+  try { const p=getPlatform(url); if(p==='youtube'){const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?\/]+)/);if(m)return `https://www.youtube.com/embed/${m[1]}?autoplay=1`;} return null; } catch(e){return null;}
+}
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+
+function updateHeader() {
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+}
+
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='today') renderToday();
+  if(name==='videos') renderVideos('fitness');
+  if(name==='tennis') renderVideos('tennis');
+  if(name==='routines') renderRoutines();
+  if(name==='favourites') renderFavourites();
+}
+
+// ========== TODAY ==========
+function getTodayDay() { return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()]; }
+
+function renderToday() {
+  const today = getTodayDay();
+  const todayR = state.routines.filter(r=>r.days&&r.days.includes(today));
+  const done = todayR.filter(r=>state.completedToday[r.id]).length;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statLeft').textContent = todayR.length - done;
+  const allVids = [...state.fitnessVideos,...state.tennisVideos];
+  document.getElementById('statVideos').textContent = todayR.filter(r=>r.videoId).length;
+  const pct = todayR.length ? Math.round((done/todayR.length)*100) : 0;
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('progressFill').style.width = pct+'%';
+  const c = document.getElementById('todayList');
+  if (!todayR.length) { c.innerHTML=`<div class="empty-state"><div class="empty-icon">💪</div><div class="empty-title">No exercises for today</div><div class="empty-sub">Add exercises in Routines and assign them to ${today}.</div></div>`; return; }
+  const allVideos = [...state.fitnessVideos,...state.tennisVideos];
+  c.innerHTML = todayR.map(r=>{
+    const isDone=state.completedToday[r.id];
+    const video=r.videoId?allVideos.find(v=>v.id===r.videoId):null;
+    const p=video?getPlatform(video.url):null;
+    return `<div class="routine-card">
+      <div class="routine-check ${isDone?'done':''}" onclick="toggleDone('${r.id}')">
+        ${isDone?'<svg width="11" height="11" fill="none" stroke="#000" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>':''}
+      </div>
+      <div class="routine-info">
+        <div class="routine-name ${isDone?'done':''}">${r.name}</div>
+        <div class="routine-details">
+          ${r.sets?`<span>🔄 ${r.sets} sets</span>`:''}
+          ${r.reps?`<span>✖️ ${r.reps}</span>`:''}
+        </div>
+        ${r.notes?`<div style="font-size:12px;color:var(--muted);margin-top:5px;">${r.notes}</div>`:''}
+        ${video?`<div class="routine-actions"><button class="btn-sm" onclick="openViewer('${video.id}','${video.id in state.fitnessVideos.reduce((a,v)=>{a[v.id]=1;return a},{}) ? 'fitness':'tennis'}')">▶ Watch ${getPlatformLabel(p)}</button></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDone(rid) { state.completedToday[rid]=!state.completedToday[rid]; saveState(); renderToday(); }
+
+// ========== VIDEOS ==========
+function getVideos(type) { return type==='fitness'?state.fitnessVideos:state.tennisVideos; }
+function setVideos(type, arr) { if(type==='fitness') state.fitnessVideos=arr; else state.tennisVideos=arr; }
+
+function renderVideos(type) {
+  const videos = getVideos(type);
+  const cats = ['All',...new Set(videos.map(v=>v.cat))];
+  const activeFilter = type==='fitness'?state.activeFitnessFilter:state.activeTennisFilter;
+  const isTennis = type==='tennis';
+
+  document.getElementById(type==='fitness'?'fitnessFilters':'tennisFilters').innerHTML =
+    cats.map(c=>`<button class="filter-pill ${isTennis?'tennis-pill':''} ${activeFilter===c?'active':''}" onclick="setFilter('${type}','${c}')">${c}</button>`).join('');
+
+  const search = document.getElementById(type==='fitness'?'fitnessSearch':'tennisSearch').value.toLowerCase();
+  const selectMode = type==='fitness'?state.fitnessSelectMode:state.tennisSelectMode;
+  const selected = type==='fitness'?state.fitnessSelected:state.tennisSelected;
+
+  // Bulk bar
+  const bulkBar = document.getElementById(type==='fitness'?'fitnessBulkBar':'tennisBulkBar');
+  const bulkCount = document.getElementById(type==='fitness'?'fitnessBulkCount':'tennisBulkCount');
+  if (selectMode) { bulkBar.classList.add('visible'); bulkCount.textContent=selected.length+' selected'; }
+  else { bulkBar.classList.remove('visible'); }
+
+  let filtered = videos;
+  if (activeFilter !== 'All') filtered = filtered.filter(v=>v.cat===activeFilter);
+  if (search) filtered = filtered.filter(v=>v.title.toLowerCase().includes(search)||(v.notes||'').toLowerCase().includes(search));
+
+  const listId = type==='fitness'?'fitnessVideoList':'tennisVideoList';
+  const container = document.getElementById(listId);
+
+  if (!videos.length) {
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">${isTennis?'🎾':'🎬'}</div><div class="empty-title">No videos yet</div><div class="empty-sub">Paste links from Instagram, TikTok, YouTube and more.</div></div>`;
+    return;
+  }
+  if (!filtered.length) { container.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No results</div></div>`; return; }
+
+  const containerClass = selectMode?(type==='fitness'?'select-mode':'tennis-select-mode'):'';
+  container.className = containerClass;
+
+  container.innerHTML = filtered.map(v=>{
+    const p=getPlatform(v.url);
+    const isSelected=selected.includes(v.id);
+    const isFav=v.favourite;
+    return `<div class="video-card ${isTennis?'tennis-card':''} ${isSelected?'selected-card':''}" id="vc_${v.id}">
+      <div class="video-card-top">
+        <div class="video-checkbox ${isSelected?'checked':''}" onclick="toggleSelectVideo('${type}','${v.id}')">
+          ${isSelected?'<svg width="11" height="11" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>':''}
+        </div>
+        <div class="video-thumbnail">${getPlatformEmoji(p)}</div>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-meta">
+            <span class="platform-badge badge-${p}">${getPlatformLabel(p)}</span>
+            <span class="video-cat">${v.cat}</span>
+            ${isFav?'<span style="color:var(--star);font-size:13px;">⭐</span>':''}
+          </div>
+          ${v.notes?`<div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4;">${v.notes}</div>`:''}
+        </div>
+      </div>
+      <div class="video-card-actions">
+        <button class="card-action-btn" onclick="openViewer('${v.id}','${type}')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Watch
+        </button>
+        <button class="card-action-btn fav-btn ${isFav?'active':''}" onclick="toggleFav('${type}','${v.id}')">
+          <span class="star-icon">${isFav?'⭐':'☆'}</span>${isFav?'Saved':'Save'}
+        </button>
+        <button class="card-action-btn" onclick="copyLink('${v.url}')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy
+        </button>
+        <button class="card-action-btn" onclick="startSelectMode('${type}','${v.id}')" style="${selectMode?'display:none':''}">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/></svg>Delete
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(type, cat) {
+  if(type==='fitness') state.activeFitnessFilter=cat; else state.activeTennisFilter=cat;
+  renderVideos(type);
+}
+
+function startSelectMode(type, firstId) {
+  if(type==='fitness'){state.fitnessSelectMode=true;state.fitnessSelected=[firstId];}
+  else{state.tennisSelectMode=true;state.tennisSelected=[firstId];}
+  renderVideos(type);
+}
+
+function toggleSelectVideo(type, vid) {
+  const arr = type==='fitness'?state.fitnessSelected:state.tennisSelected;
+  const idx=arr.indexOf(vid);
+  if(idx>=0) arr.splice(idx,1); else arr.push(vid);
+  renderVideos(type);
+}
+
+function cancelSelectMode(type) {
+  if(type==='fitness'){state.fitnessSelectMode=false;state.fitnessSelected=[];}
+  else{state.tennisSelectMode=false;state.tennisSelected=[];}
+  renderVideos(type);
+}
+
+function bulkDelete(type) {
+  const selected = type==='fitness'?state.fitnessSelected:state.tennisSelected;
+  if(!selected.length){toast('Nothing selected');return;}
+  if(!confirm(`Delete ${selected.length} video(s)?`)) return;
+  const videos = getVideos(type).filter(v=>!selected.includes(v.id));
+  setVideos(type, videos);
+  if(type==='fitness'){state.fitnessSelectMode=false;state.fitnessSelected=[];}
+  else{state.tennisSelectMode=false;state.tennisSelected=[];}
+  saveState();
+  renderVideos(type);
+  toast(`${selected.length} video(s) deleted`);
+}
+
+function toggleFav(type, vid) {
+  const videos = getVideos(type);
+  const v = videos.find(x=>x.id===vid);
+  if(v){v.favourite=!v.favourite; saveState(); renderVideos(type); toast(v.favourite?'Added to favourites ⭐':'Removed from favourites');}
+}
+
+function copyLink(url) { navigator.clipboard.writeText(url).then(()=>toast('Link copied!')).catch(()=>toast('Could not copy')); }
+
+// ========== VIDEO MODAL ==========
+function openVideoModal(type, editId) {
+  state.editVideoType = type;
+  state.editVideoId = editId||null;
+  const isTennis = type==='tennis';
+  document.getElementById('vType').value = type;
+  document.getElementById('videoModalTitle').textContent = (editId?'Edit':'Add')+' '+(isTennis?'Tennis':'Fitness')+' Video';
+  document.getElementById('videoSaveBtn').className = 'btn-save'+(isTennis?' tennis':'');
+
+  // Populate categories
+  const cats = isTennis?TENNIS_CATS:FITNESS_CATS;
+  document.getElementById('vCat').innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+  if(editId){
+    const v=getVideos(type).find(x=>x.id===editId);
+    document.getElementById('vTitle').value=v.title;
+    document.getElementById('vUrl').value=v.url;
+    document.getElementById('vCat').value=v.cat;
+    document.getElementById('vNotes').value=v.notes||'';
+    detectPlatform();
+  } else {
+    document.getElementById('vTitle').value='';
+    document.getElementById('vUrl').value='';
+    document.getElementById('vCat').value=cats[0];
+    document.getElementById('vNotes').value='';
+    document.getElementById('platformDetected').textContent='';
+  }
+  document.getElementById('videoModal').classList.add('open');
+}
+
+function closeVideoModal() { document.getElementById('videoModal').classList.remove('open'); }
+
+function detectPlatform() {
+  const url=document.getElementById('vUrl').value;
+  const p=getPlatform(url);
+  const el=document.getElementById('platformDetected');
+  el.textContent = url?(getPlatformEmoji(p)+' '+getPlatformLabel(p)+' detected'):'';
+}
+
+function saveVideo() {
+  const title=document.getElementById('vTitle').value.trim();
+  const url=document.getElementById('vUrl').value.trim();
+  if(!title||!url){toast('Please fill in title and URL');return;}
+  const type=state.editVideoType;
+  const data={title,url,cat:document.getElementById('vCat').value,notes:document.getElementById('vNotes').value.trim()};
+  if(state.editVideoId){
+    const videos=getVideos(type).map(v=>v.id===state.editVideoId?{...v,...data}:v);
+    setVideos(type,videos); toast('Video updated!');
+  } else {
+    getVideos(type).push({id:uid(),...data,favourite:false,addedAt:Date.now()});
+    toast('Video saved!');
+  }
+  saveState(); closeVideoModal();
+  renderVideos(type);
+}
+
+// ========== ROUTINES ==========
+function renderRoutines() {
+  const c=document.getElementById('routineList');
+  if(!state.routines.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No exercises yet</div><div class="empty-sub">Add exercises, assign them to days, and optionally link a video.</div></div>`;return;}
+  const byDay={};
+  DAYS.forEach(d=>{byDay[d]=[];});
+  const noDays=[];
+  state.routines.forEach(r=>{
+    if(!r.days||!r.days.length) noDays.push(r);
+    else r.days.forEach(d=>{if(byDay[d])byDay[d].push(r);});
+  });
+  let html='';
+  DAYS.forEach(day=>{
+    if(!byDay[day].length)return;
+    html+=`<div class="day-section"><div class="day-label">${day}</div>`;
+    html+=byDay[day].map(r=>routineCardHTML(r)).join('');
+    html+='</div>';
+  });
+  if(noDays.length){html+=`<div class="day-section"><div class="day-label">No Day Assigned</div>`;html+=noDays.map(r=>routineCardHTML(r)).join('');html+='</div>';}
+  c.innerHTML=html;
+}
+
+function routineCardHTML(r) {
+  const allVids=[...state.fitnessVideos,...state.tennisVideos];
+  const video=r.videoId?allVids.find(v=>v.id===r.videoId):null;
+  const p=video?getPlatform(video.url):null;
+  const vtype=video?(state.fitnessVideos.find(v=>v.id===video.id)?'fitness':'tennis'):null;
+  return `<div class="routine-card">
+    <div class="routine-info">
+      <div class="routine-name">${r.name}</div>
+      <div class="routine-details">
+        ${r.sets?`<span>🔄 ${r.sets} sets</span>`:''}
+        ${r.reps?`<span>✖️ ${r.reps}</span>`:''}
+        ${r.days&&r.days.length?`<span>📅 ${r.days.join(', ')}</span>`:''}
+      </div>
+      ${r.notes?`<div style="font-size:12px;color:var(--muted);margin-top:5px;">${r.notes}</div>`:''}
+      ${video?`<div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;">${getPlatformEmoji(p)} ${video.title} <button class="btn-sm" onclick="openViewer('${video.id}','${vtype}')">▶ Watch</button></div>`:''}
+      <div class="routine-actions">
+        <button class="btn-sm" onclick="openRoutineModal('${r.id}')">Edit</button>
+        <button class="btn-sm danger" onclick="deleteRoutine('${r.id}')">Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function deleteRoutine(rid){if(!confirm('Delete this exercise?'))return;state.routines=state.routines.filter(r=>r.id!==rid);saveState();renderRoutines();toast('Exercise deleted');}
+
+// ========== ROUTINE MODAL ==========
+function openRoutineModal(editId) {
+  state.editRoutineId=editId||null; state.selectedRoutineVideo=null; state.selectedDays=[];
+  document.getElementById('dayPills').innerHTML=DAYS.map(d=>`<button class="day-pill" id="pill_${d}" onclick="toggleDay('${d}')">${d}</button>`).join('');
+  const allVids=[...state.fitnessVideos,...state.tennisVideos];
+  const vList=document.getElementById('videoSelectList');
+  const noVMsg=document.getElementById('noVideosMsg');
+  if(!allVids.length){vList.innerHTML='';noVMsg.style.display='block';}
+  else{
+    noVMsg.style.display='none';
+    vList.innerHTML=allVids.map(v=>{
+      const p=getPlatform(v.url);
+      const isTennis=!!state.tennisVideos.find(x=>x.id===v.id);
+      return `<div class="video-select-item" id="vsel_${v.id}" onclick="selectRoutineVideo('${v.id}')">
+        <div class="video-select-thumb">${getPlatformEmoji(p)}</div>
+        <span class="video-select-name">${v.title}</span>
+        <span class="platform-badge badge-${p}" style="${isTennis?'color:var(--tennis)':''}">${isTennis?'🎾':getPlatformLabel(p)}</span>
+      </div>`;
+    }).join('');
+  }
+  if(editId){
+    const r=state.routines.find(x=>x.id===editId);
+    document.getElementById('rName').value=r.name;
+    document.getElementById('rSets').value=r.sets||'';
+    document.getElementById('rReps').value=r.reps||'';
+    document.getElementById('rNotes').value=r.notes||'';
+    state.selectedDays=r.days?[...r.days]:[];
+    state.selectedDays.forEach(d=>{const p=document.getElementById('pill_'+d);if(p)p.classList.add('active');});
+    if(r.videoId)selectRoutineVideo(r.videoId);
+    document.getElementById('routineModalTitle').textContent='Edit Exercise';
+  } else {
+    document.getElementById('rName').value='';
+    document.getElementById('rSets').value='';
+    document.getElementById('rReps').value='';
+    document.getElementById('rNotes').value='';
+    document.getElementById('routineModalTitle').textContent='Add Exercise';
+  }
+  document.getElementById('routineModal').classList.add('open');
+}
+
+function closeRoutineModal(){document.getElementById('routineModal').classList.remove('open');}
+
+function toggleDay(d){
+  const idx=state.selectedDays.indexOf(d);
+  if(idx>=0){state.selectedDays.splice(idx,1);document.getElementById('pill_'+d).classList.remove('active');}
+  else{state.selectedDays.push(d);document.getElementById('pill_'+d).classList.add('active');}
+}
+
+function selectRoutineVideo(vid){
+  document.querySelectorAll('.video-select-item').forEach(el=>el.classList.remove('selected'));
+  if(state.selectedRoutineVideo===vid){state.selectedRoutineVideo=null;}
+  else{state.selectedRoutineVideo=vid;const el=document.getElementById('vsel_'+vid);if(el)el.classList.add('selected');}
+}
+
+function saveRoutine(){
+  const name=document.getElementById('rName').value.trim();
+  if(!name){toast('Please enter an exercise name');return;}
+  const data={name,sets:document.getElementById('rSets').value.trim(),reps:document.getElementById('rReps').value.trim(),notes:document.getElementById('rNotes').value.trim(),days:[...state.selectedDays],videoId:state.selectedRoutineVideo||null};
+  if(state.editRoutineId){state.routines=state.routines.map(r=>r.id===state.editRoutineId?{...r,...data}:r);toast('Exercise updated!');}
+  else{state.routines.push({id:uid(),...data,addedAt:Date.now()});toast('Exercise added!');}
+  saveState();closeRoutineModal();renderRoutines();
+}
+
+// ========== FAVOURITES ==========
+function renderFavourites(){
+  const c=document.getElementById('favouritesList');
+  const favFitness=state.fitnessVideos.filter(v=>v.favourite);
+  const favTennis=state.tennisVideos.filter(v=>v.favourite);
+  if(!favFitness.length&&!favTennis.length){
+    c.innerHTML=`<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">No favourites yet</div><div class="empty-sub">Tap the ☆ Save button on any video to add it here.</div></div>`;
+    return;
+  }
+  let html='';
+  if(favFitness.length){
+    html+=`<div class="fav-section"><div class="fav-section-label fitness-fav">💪 Fitness</div>`;
+    html+=favFitness.map(v=>favCardHTML(v,'fitness')).join('');
+    html+='</div>';
+  }
+  if(favTennis.length){
+    html+=`<div class="fav-section"><div class="fav-section-label tennis-fav">🎾 Tennis</div>`;
+    html+=favTennis.map(v=>favCardHTML(v,'tennis')).join('');
+    html+='</div>';
+  }
+  c.innerHTML=html;
+}
+
+function favCardHTML(v,type){
+  const p=getPlatform(v.url);
+  return `<div class="video-card ${type==='tennis'?'tennis-card':''}">
+    <div class="video-card-top">
+      <div class="video-thumbnail">${getPlatformEmoji(p)}</div>
+      <div class="video-info">
+        <div class="video-title">${v.title}</div>
+        <div class="video-meta">
+          <span class="platform-badge badge-${p}">${getPlatformLabel(p)}</span>
+          <span class="video-cat">${v.cat}</span>
+        </div>
+        ${v.notes?`<div style="font-size:12px;color:var(--muted);margin-top:5px;">${v.notes}</div>`:''}
+      </div>
+    </div>
+    <div class="video-card-actions">
+      <button class="card-action-btn" onclick="openViewer('${v.id}','${type}')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Watch
+      </button>
+      <button class="card-action-btn fav-btn active" onclick="toggleFav('${type}','${v.id}');renderFavourites()">
+        <span class="star-icon">⭐</span> Remove
+      </button>
+      <button class="card-action-btn" onclick="copyLink('${v.url}')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy
+      </button>
+    </div>
+  </div>`;
+}
+
+// ========== VIEWER ==========
+function openViewer(vid, type) {
+  const videos = type==='fitness'?state.fitnessVideos:state.tennisVideos;
+  const v=videos.find(x=>x.id===vid);
+  if(!v)return;
+  const p=getPlatform(v.url);
+  const embedUrl=getEmbedUrl(v.url);
+  document.getElementById('viewerTitle').textContent=v.title;
+  document.getElementById('viewerLink').href=v.url;
+  const frame=document.getElementById('viewerFrame');
+  if(embedUrl){
+    frame.innerHTML=`<iframe src="${embedUrl}" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
+  } else {
+    const msgs={instagram:'Instagram restricts embedding — tap below to open it.',tiktok:'TikTok restricts embedding — tap below to open it.',twitter:'Tap below to open on Twitter/X.',facebook:'Tap below to open on Facebook.',other:'Tap below to open this video.'};
+    frame.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;padding:22px;text-align:center;"><div style="font-size:52px;">${getPlatformEmoji(p)}</div><div style="font-size:15px;font-weight:700;">${v.title}</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">${msgs[p]||msgs.other}</div></div>`;
+  }
+  document.getElementById('videoViewer').classList.add('open');
+}
+
+function closeViewer(){document.getElementById('videoViewer').classList.remove('open');document.getElementById('viewerFrame').innerHTML='';}
+
+// Close on overlay click
+document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
+document.getElementById('routineModal').addEventListener('click',function(e){if(e.target===this)closeRoutineModal();});
+
+loadState();
+updateHeader();
+renderToday();
+</script>
+</body>
+</html>
