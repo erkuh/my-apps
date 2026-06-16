@@ -40,9 +40,9 @@ main{max-width:600px;margin:0 auto;padding:20px 16px 100px;}
 .filter-pill{background:var(--white);border:1.5px solid var(--line);color:var(--gray);border-radius:20px;padding:6px 13px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;transition:all 0.15s;}
 .filter-pill.active{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
 .search-container{margin-bottom:18px;position:relative;}
-.search-input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px 12px 40px;font-size:15px;font-family:inherit;background:var(--white);color:var(--ink);outline:none;transition:border-color 0.2s;}
+.search-input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px 12px 36px;font-size:15px;font-family:inherit;background:var(--white);color:var(--ink);outline:none;transition:border-color 0.2s;}
 .search-input:focus{border-color:var(--orange);}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-52%);pointer-events:none;line-height:0;}
 .recipes-grid{display:flex;flex-direction:column;gap:12px;}
 .recipe-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid transparent;transition:border-color 0.15s;}
 .recipe-card.selected{border-color:var(--red);background:#fffafa;}
@@ -81,7 +81,7 @@ main{max-width:600px;margin:0 auto;padding:20px 16px 100px;}
 .panel-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 20px;}
 .panel-title{font-size:18px;font-weight:700;margin-bottom:20px;}
 label.field-label{display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:5px;letter-spacing:0.3px;text-transform:uppercase;}
-input[type=text],input[type=url],input[type=search],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--ink);outline:none;margin-bottom:14px;transition:border-color 0.2s;}
+input[type=text],input[type=url],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--ink);outline:none;margin-bottom:14px;transition:border-color 0.2s;}
 input:focus,select:focus,textarea:focus{border-color:var(--orange);}
 textarea{resize:vertical;min-height:80px;}
 .thumb-upload-area{border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;cursor:pointer;margin-bottom:14px;background:var(--bg);position:relative;}
@@ -134,7 +134,7 @@ textarea{resize:vertical;min-height:80px;}
     <div class="filter-row" id="catFilters"></div>
   </div>
   <div class="search-container">
-    <span class="search-icon">🔍</span>
+    <span class="search-icon"><svg width="16" height="16" fill="none" stroke="#6b6860" stroke-width="2" viewBox="0 0 24 24" style="display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
     <input type="search" class="search-input" id="searchBar" placeholder="Search recipes, tags, ingredients..." oninput="handleSearch()"/>
   </div>
   <div class="recipes-grid" id="recipesGrid"><div class="loading">🍳 Loading your recipes...</div></div>
