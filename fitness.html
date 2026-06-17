@@ -12,10 +12,9 @@
   --accent: #C6F135; --accent-dim: rgba(198,241,53,0.12);
   --text: #F5F5F5; --muted: #888;
   --red: #FF5252; --blue: #4A9EFF; --pink: #FF4B8B;
-  --tennis: #FFD700; --tennis-dim: rgba(255,215,0,0.12);
-  --star: #FFD700;
+  --tennis: #FFD700; --star: #FFD700;
 }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: 85px; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; padding-bottom:85px; }
 
 header { display:flex; align-items:center; justify-content:space-between; padding:18px 18px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:10; }
 .logo { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
@@ -33,11 +32,20 @@ nav { position:fixed; bottom:0; left:0; right:0; background:#111; border-top:1px
 .page.active { display:block; }
 
 .section-header { display:flex; align-items:center; justify-content:space-between; padding:18px 0 12px; }
-.section-title { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+.section-title { font-size:20px; font-weight:800; }
 
 .btn-add { background:var(--accent); color:#000; border:none; border-radius:20px; padding:8px 15px; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; }
 .btn-add.tennis { background:var(--tennis); }
 
+/* BULK DELETE */
+.bulk-bar { display:none; position:sticky; top:57px; z-index:9; background:#1C1C1C; border:1px solid var(--border); border-radius:14px; padding:11px 15px; margin-bottom:12px; flex-direction:row; align-items:center; justify-content:space-between; }
+.bulk-bar.visible { display:flex; }
+.bulk-count { font-size:14px; font-weight:700; }
+.bulk-actions { display:flex; gap:8px; }
+.btn-bulk-cancel { background:var(--card2); border:1px solid var(--border); color:var(--muted); border-radius:10px; padding:7px 13px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-bulk-delete { background:var(--red); color:#fff; border:none; border-radius:10px; padding:7px 13px; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* MODAL */
 .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:200; align-items:flex-end; justify-content:center; }
 .overlay.open { display:flex; }
 .modal { background:#1C1C1C; border-radius:24px 24px 0 0; padding:22px 18px 36px; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; animation:slideUp 0.28s ease; }
@@ -46,29 +54,36 @@ nav { position:fixed; bottom:0; left:0; right:0; background:#111; border-top:1px
 .modal-title { font-size:18px; font-weight:800; margin-bottom:18px; }
 
 label { display:block; font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:7px; }
-input[type="text"], input[type="url"], textarea, select { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:15px; padding:12px 14px; margin-bottom:14px; outline:none; font-family:inherit; transition:border-color 0.2s; }
-input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+input[type="text"],input[type="url"],textarea,select { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:15px; padding:12px 14px; margin-bottom:14px; outline:none; font-family:inherit; transition:border-color 0.2s; }
+input:focus,textarea:focus,select:focus { border-color:var(--accent); }
 textarea { resize:vertical; min-height:75px; }
 select option { background:#222; }
 .form-group { margin-bottom:14px; }
 .form-group label { margin-bottom:7px; }
-.form-group input, .form-group select, .form-group textarea { margin-bottom:0; }
-
+.form-group input,.form-group select,.form-group textarea { margin-bottom:0; }
 .btn-row { display:flex; gap:10px; margin-top:6px; }
 .btn-cancel { flex:1; background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:13px; font-size:15px; font-weight:600; cursor:pointer; }
 .btn-save { flex:2; background:var(--accent); color:#000; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:800; cursor:pointer; }
 .btn-save.tennis { background:var(--tennis); }
 
-.platform-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; letter-spacing:0.4px; text-transform:uppercase; }
+/* BADGES */
+.platform-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; text-transform:uppercase; }
 .badge-instagram { background:rgba(255,75,139,0.15); color:var(--pink); }
 .badge-tiktok { background:rgba(255,255,255,0.1); color:#fff; }
 .badge-youtube { background:rgba(255,82,82,0.15); color:var(--red); }
-.badge-twitter { background:rgba(74,158,255,0.15); color:var(--blue); }
 .badge-other { background:rgba(198,241,53,0.12); color:var(--accent); }
 
+/* VIDEO CARDS */
 .video-card { background:var(--card); border:1px solid var(--border); border-radius:18px; margin-bottom:12px; overflow:hidden; }
 .video-card.tennis-card { border-color:#2a2500; }
-.video-card-top { padding:14px; display:flex; align-items:flex-start; gap:11px; }
+.video-card.selected-card { border-color:var(--red); background:#1f1515; }
+.video-card.tennis-card.selected-card { border-color:var(--tennis); background:#1f1d00; }
+
+.video-card-top { padding:14px; display:flex; align-items:flex-start; gap:11px; cursor:pointer; }
+.video-checkbox { width:22px; height:22px; border:2px solid var(--border); border-radius:6px; flex-shrink:0; cursor:pointer; display:none; align-items:center; justify-content:center; margin-top:2px; transition:all 0.15s; }
+.select-mode .video-checkbox { display:flex; }
+.video-checkbox.checked { background:var(--red); border-color:var(--red); }
+
 .video-thumbnail { width:64px; height:64px; border-radius:12px; background:var(--card2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; }
 .video-thumbnail img { width:100%; height:100%; object-fit:cover; border-radius:12px; }
 .video-info { flex:1; min-width:0; }
@@ -79,9 +94,10 @@ select option { background:#222; }
 .video-card-actions { display:flex; border-top:1px solid var(--border); }
 .card-action-btn { flex:1; background:none; border:none; color:var(--muted); font-size:12px; font-weight:600; padding:11px 6px; cursor:pointer; transition:color 0.15s; display:flex; align-items:center; justify-content:center; gap:5px; }
 .card-action-btn:hover { color:var(--accent); }
-.card-action-btn + .card-action-btn { border-left:1px solid var(--border); }
+.card-action-btn+.card-action-btn { border-left:1px solid var(--border); }
 .card-action-btn.fav-btn.active { color:var(--star); }
 
+/* FILTERS */
 .filter-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:12px; scrollbar-width:none; }
 .filter-row::-webkit-scrollbar { display:none; }
 .filter-pill { background:var(--card); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:6px 13px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; flex-shrink:0; }
@@ -90,27 +106,27 @@ select option { background:#222; }
 
 .search-wrap { position:relative; margin-bottom:12px; }
 .search-wrap input { padding-left:38px; margin-bottom:0; }
-.search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+.search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; line-height:0; }
 
 .empty-state { text-align:center; padding:55px 20px; color:var(--muted); }
 .empty-icon { font-size:46px; margin-bottom:12px; }
 .empty-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:7px; }
 .empty-sub { font-size:14px; line-height:1.5; }
 
+/* TODAY */
 .stats-row { display:flex; gap:9px; margin-bottom:4px; }
 .stat-card { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 10px; text-align:center; }
 .stat-num { font-size:24px; font-weight:900; color:var(--accent); line-height:1; }
 .stat-label { font-size:11px; color:var(--muted); font-weight:600; margin-top:4px; }
-
 .progress-wrap { margin-bottom:18px; margin-top:12px; }
 .progress-label { display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:7px; }
 .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
 .progress-fill { height:100%; background:var(--accent); border-radius:3px; transition:width 0.4s ease; }
 
+/* ROUTINES */
 .day-section { margin-bottom:22px; }
 .day-label { font-size:12px; font-weight:800; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:9px; display:flex; align-items:center; gap:8px; }
 .day-label::after { content:''; flex:1; height:1px; background:var(--border); }
-
 .routine-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:9px; display:flex; gap:12px; align-items:flex-start; }
 .routine-check { width:22px; height:22px; border:2px solid var(--border); border-radius:50%; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-top:2px; transition:all 0.15s; }
 .routine-check.done { background:var(--accent); border-color:var(--accent); }
@@ -134,16 +150,19 @@ select option { background:#222; }
 .sets-row { display:flex; gap:9px; }
 .sets-row > div { flex:1; }
 
-.tennis-header { background:linear-gradient(135deg, #1a1500, #0f0f0f); border:1px solid #3a3000; border-radius:16px; padding:16px; margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+/* TENNIS */
+.tennis-header { background:linear-gradient(135deg,#1a1500,#0f0f0f); border:1px solid #3a3000; border-radius:16px; padding:16px; margin-bottom:18px; display:flex; align-items:center; gap:12px; }
 .tennis-header-title { font-size:16px; font-weight:800; color:var(--tennis); }
 .tennis-header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
 
+/* FAVOURITES */
 .fav-section { margin-bottom:24px; }
 .fav-section-label { font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
 .fav-section-label.fitness-fav { color:var(--accent); }
 .fav-section-label.tennis-fav { color:var(--tennis); }
 .fav-section-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
+/* VIEWER */
 .video-viewer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:300; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
 .video-viewer-overlay.open { display:flex; }
 .viewer-close { position:absolute; top:18px; right:18px; background:var(--card2); border:1px solid var(--border); color:var(--text); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
@@ -164,8 +183,9 @@ select option { background:#222; }
   <div class="header-date" id="headerDate"></div>
 </header>
 
+<!-- TODAY -->
 <div class="page active" id="page-today">
-  <div class="section-header"><div><div class="section-title">Today's Workout</div></div></div>
+  <div class="section-header"><div class="section-title">Today's Workout</div></div>
   <div class="stats-row">
     <div class="stat-card"><div class="stat-num" id="statDone">0</div><div class="stat-label">Done</div></div>
     <div class="stat-card"><div class="stat-num" id="statLeft">0</div><div class="stat-label">Left</div></div>
@@ -178,6 +198,7 @@ select option { background:#222; }
   <div id="todayList"></div>
 </div>
 
+<!-- FITNESS VIDEOS -->
 <div class="page" id="page-videos">
   <div class="section-header">
     <div class="section-title">Fitness Videos</div>
@@ -185,14 +206,22 @@ select option { background:#222; }
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
     </button>
   </div>
+  <div class="bulk-bar" id="fitnessBulkBar">
+    <span class="bulk-count" id="fitnessBulkCount">0 selected</span>
+    <div class="bulk-actions">
+      <button class="btn-bulk-cancel" onclick="cancelSelect('fitness')">Cancel</button>
+      <button class="btn-bulk-delete" onclick="bulkDelete('fitness')">🗑 Delete</button>
+    </div>
+  </div>
   <div class="search-wrap">
-    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
     <input type="text" placeholder="Search fitness videos..." id="fitnessSearch" oninput="renderVideos('fitness')">
   </div>
   <div class="filter-row" id="fitnessFilters"></div>
   <div id="fitnessVideoList"><div class="loading">Loading...</div></div>
 </div>
 
+<!-- TENNIS -->
 <div class="page" id="page-tennis">
   <div class="tennis-header">
     <div style="font-size:32px;">🎾</div>
@@ -204,14 +233,22 @@ select option { background:#222; }
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
     </button>
   </div>
+  <div class="bulk-bar" id="tennisBulkBar">
+    <span class="bulk-count" id="tennisBulkCount">0 selected</span>
+    <div class="bulk-actions">
+      <button class="btn-bulk-cancel" onclick="cancelSelect('tennis')">Cancel</button>
+      <button class="btn-bulk-delete" onclick="bulkDelete('tennis')">🗑 Delete</button>
+    </div>
+  </div>
   <div class="search-wrap">
-    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    <span class="search-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
     <input type="text" placeholder="Search tennis videos..." id="tennisSearch" oninput="renderVideos('tennis')">
   </div>
   <div class="filter-row" id="tennisFilters"></div>
   <div id="tennisVideoList"><div class="loading">Loading...</div></div>
 </div>
 
+<!-- ROUTINES -->
 <div class="page" id="page-routines">
   <div class="section-header">
     <div class="section-title">My Routines</div>
@@ -222,11 +259,13 @@ select option { background:#222; }
   <div id="routineList"><div class="loading">Loading...</div></div>
 </div>
 
+<!-- FAVOURITES -->
 <div class="page" id="page-favourites">
   <div class="section-header"><div class="section-title">⭐ Favourites</div></div>
   <div id="favouritesList"></div>
 </div>
 
+<!-- NAV -->
 <nav>
   <button class="nav-btn active" onclick="switchPage('today',this)">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Today
@@ -241,7 +280,7 @@ select option { background:#222; }
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12h12M6 6h12M6 18h8"/></svg>Routines
   </button>
   <button class="nav-btn fav-tab" onclick="switchPage('favourites',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Saved
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Favourites
   </button>
 </nav>
 
@@ -255,7 +294,7 @@ select option { background:#222; }
     <div class="form-group">
       <label>Social Media Link</label>
       <input type="url" id="vUrl" placeholder="Paste Instagram, TikTok, YouTube URL..." oninput="detectPlatform()">
-      <div id="platformDetected" style="margin-top:6px; font-size:12px; color:var(--accent);"></div>
+      <div id="platformDetected" style="margin-top:6px;font-size:12px;color:var(--accent);"></div>
     </div>
     <div class="form-group"><label>Category</label><select id="vCat"></select></div>
     <div class="form-group"><label>Notes (optional)</label><textarea id="vNotes" placeholder="Tips, modifications, reminders..."></textarea></div>
@@ -293,7 +332,7 @@ select option { background:#222; }
   </div>
 </div>
 
-<!-- VIDEO VIEWER -->
+<!-- VIEWER -->
 <div class="video-viewer-overlay" id="videoViewer">
   <button class="viewer-close" onclick="closeViewer()">✕</button>
   <div class="viewer-title" id="viewerTitle"></div>
@@ -309,96 +348,73 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const FITNESS_CATS = ['General','Warm Up','Stretches & Cool Down','Strength','Cardio','HIIT','Core','Upper Body','Lower Body','Legs & Glutes','Flexibility','Yoga','Pilates'];
-const TENNIS_CATS = ['General','Footwork','Forehand','Backhand','Serve','Volley','Return','Strategy & Tips','Fitness for Tennis','Drills','Mental Game'];
+const FITNESS_CATS = ['Warm Up','Strength','Cardio','HIIT','Core','Upper Body','Lower Body','Yoga','Pilates'];
+const TENNIS_CATS = ['Footwork','Forehand','Backhand','Serve','Volley','Return','Strategy & Tips','Fitness for Tennis','Drills','Mental Game'];
 
-let fitnessVideos = [], tennisVideos = [], routines = [];
-let completedToday = {};
-let lastDate = null;
-let activeFitnessFilter = 'All', activeTennisFilter = 'All';
-let selectedRoutineVideo = null, selectedDays = [];
-let editVideoId = null, editVideoType = null, editRoutineId = null;
+let fitnessVideos=[], tennisVideos=[], routines=[];
+let completedToday={};
+let activeFitnessFilter='All', activeTennisFilter='All';
+let fitnessSelectMode=false, tennisSelectMode=false;
+let fitnessSelected=[], tennisSelected=[];
+let selectedRoutineVideo=null, selectedDays=[];
+let editVideoId=null, editVideoType=null, editRoutineId=null;
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
-function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
-function getPlatform(url) { if(!url)return'other'; const u=url.toLowerCase(); if(u.includes('instagram.com'))return'instagram'; if(u.includes('tiktok.com'))return'tiktok'; if(u.includes('youtube.com')||u.includes('youtu.be'))return'youtube'; if(u.includes('twitter.com')||u.includes('x.com'))return'twitter'; return'other'; }
-function getPlatformLabel(p) { return{instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',twitter:'Twitter',other:'Web'}[p]||'Web'; }
-function getPlatformEmoji(p) { return{instagram:'📸',tiktok:'🎵',youtube:'▶️',twitter:'🐦',other:'🔗'}[p]||'🔗'; }
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+function getPlatform(url){if(!url)return'other';const u=url.toLowerCase();if(u.includes('instagram.com'))return'instagram';if(u.includes('tiktok.com'))return'tiktok';if(u.includes('youtube.com')||u.includes('youtu.be'))return'youtube';return'other';}
+function getPlatformLabel(p){return{instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',other:'Web'}[p]||'Web';}
+function getPlatformEmoji(p){return{instagram:'📸',tiktok:'🎵',youtube:'▶️',other:'🔗'}[p]||'🔗';}
+function getYoutubeThumbnail(url){const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?\/]+)/);return m?`https://img.youtube.com/vi/${m[1]}/mqdefault.jpg`:null;}
+function getEmbedUrl(url){const p=getPlatform(url);if(p==='youtube'){const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?\/]+)/);if(m)return`https://www.youtube.com/embed/${m[1]}?autoplay=1`;}return null;}
 
-function getYoutubeThumbnail(url) {
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?\/]+)/);
-  if (match) return `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
-  return null;
-}
+function loadCompleted(){try{const s=JSON.parse(localStorage.getItem('fithub_completed')||'{}');const today=new Date().toDateString();completedToday=s.date===today?(s.data||{}):{};} catch(e){completedToday={};}}
+function saveCompleted(){localStorage.setItem('fithub_completed',JSON.stringify({date:new Date().toDateString(),data:completedToday}));}
 
-function getEmbedUrl(url) {
-  const p=getPlatform(url);
-  if(p==='youtube'){const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?\/]+)/);if(m)return`https://www.youtube.com/embed/${m[1]}?autoplay=1`;}
-  return null;
-}
-
-// Load completed today from localStorage
-function loadCompleted() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('fithub_completed')||'{}');
-    const today = new Date().toDateString();
-    if (saved.date !== today) { completedToday = {}; } else { completedToday = saved.data || {}; }
-  } catch(e) { completedToday = {}; }
-}
-function saveCompleted() {
-  localStorage.setItem('fithub_completed', JSON.stringify({date: new Date().toDateString(), data: completedToday}));
-}
-
-async function loadAll() {
+async function loadAll(){
   loadCompleted();
-  try {
-    const [fv, tv, rv] = await Promise.all([
-      db.from('fitness_videos').select('*').order('added_at', {ascending:false}),
-      db.from('tennis_videos').select('*').order('added_at', {ascending:false}),
-      db.from('routines').select('*').order('added_at', {ascending:false})
+  try{
+    const[fv,tv,rv]=await Promise.all([
+      db.from('fitness_videos').select('*').order('added_at',{ascending:false}),
+      db.from('tennis_videos').select('*').order('added_at',{ascending:false}),
+      db.from('routines').select('*').order('added_at',{ascending:false})
     ]);
-    fitnessVideos = fv.data || [];
-    tennisVideos = tv.data || [];
-    routines = rv.data || [];
-  } catch(e) {
-    console.error(e);
-    toast('Could not connect to database');
-  }
+    fitnessVideos=fv.data||[];
+    tennisVideos=tv.data||[];
+    routines=rv.data||[];
+  }catch(e){console.error(e);toast('Could not connect');}
   renderToday();
   renderVideos('fitness');
   renderVideos('tennis');
   renderRoutines();
 }
 
-function updateHeader() {
-  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-}
+function updateHeader(){document.getElementById('headerDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
 
-function switchPage(name, btn) {
+function switchPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  if(name==='favourites') renderFavourites();
+  if(name==='favourites')renderFavourites();
 }
 
 // TODAY
-function getTodayDay() { return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()]; }
+function getTodayDay(){return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()];}
 
-function renderToday() {
-  const today = getTodayDay();
-  const todayR = routines.filter(r=>r.days&&r.days.includes(today));
-  const done = todayR.filter(r=>completedToday[r.id]).length;
-  document.getElementById('statDone').textContent = done;
-  document.getElementById('statLeft').textContent = todayR.length - done;
-  const allVids = [...fitnessVideos,...tennisVideos];
-  document.getElementById('statVideos').textContent = todayR.filter(r=>r.video_id).length;
-  const pct = todayR.length ? Math.round((done/todayR.length)*100) : 0;
-  document.getElementById('progressPct').textContent = pct+'%';
-  document.getElementById('progressFill').style.width = pct+'%';
-  const c = document.getElementById('todayList');
+function renderToday(){
+  const today=getTodayDay();
+  const todayR=routines.filter(r=>r.days&&r.days.includes(today));
+  const done=todayR.filter(r=>completedToday[r.id]).length;
+  document.getElementById('statDone').textContent=done;
+  document.getElementById('statLeft').textContent=todayR.length-done;
+  const allVids=[...fitnessVideos,...tennisVideos];
+  document.getElementById('statVideos').textContent=todayR.filter(r=>r.video_id).length;
+  const pct=todayR.length?Math.round((done/todayR.length)*100):0;
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressFill').style.width=pct+'%';
+  const c=document.getElementById('todayList');
   if(!todayR.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">💪</div><div class="empty-title">No exercises for today</div><div class="empty-sub">Add exercises in Routines and assign them to ${today}.</div></div>`;return;}
-  c.innerHTML = todayR.map(r=>{
+  c.innerHTML=todayR.map(r=>{
     const isDone=completedToday[r.id];
     const video=r.video_id?allVids.find(v=>v.id===r.video_id):null;
     const vtype=video?(fitnessVideos.find(v=>v.id===video.id)?'fitness':'tennis'):null;
@@ -415,38 +431,54 @@ function renderToday() {
           ${r.reps?`<span>✖️ ${r.reps}</span>`:''}
         </div>
         ${r.notes?`<div style="font-size:12px;color:var(--muted);margin-top:5px;">${r.notes}</div>`:''}
-        ${video?`<div class="routine-actions"><button class="btn-sm" onclick="openViewer('${video.id}','${vtype}')">▶ Watch ${getPlatformLabel(p)}</button></div>`:''}
+        ${video?`<div class="routine-actions"><button class="btn-sm" onclick="openViewer('${video.id}','${vtype}')">▶ Watch</button></div>`:''}
       </div>
       ${video&&ythumb?`<div style="width:48px;height:48px;border-radius:10px;overflow:hidden;flex-shrink:0;cursor:pointer;" onclick="openViewer('${video.id}','${vtype}')"><img src="${ythumb}" style="width:100%;height:100%;object-fit:cover;"></div>`:''}
     </div>`;
   }).join('');
 }
 
-function toggleDone(rid) { completedToday[rid]=!completedToday[rid]; saveCompleted(); renderToday(); }
+function toggleDone(rid){completedToday[rid]=!completedToday[rid];saveCompleted();renderToday();}
 
 // VIDEOS
-function renderVideos(type) {
-  const videos = type==='fitness'?fitnessVideos:tennisVideos;
-  const activeFilter = type==='fitness'?activeFitnessFilter:activeTennisFilter;
-  const isTennis = type==='tennis';
-  const cats = ['All',...new Set(videos.map(v=>v.cat))];
-  document.getElementById(type==='fitness'?'fitnessFilters':'tennisFilters').innerHTML =
+function renderVideos(type){
+  const videos=type==='fitness'?fitnessVideos:tennisVideos;
+  const activeFilter=type==='fitness'?activeFitnessFilter:activeTennisFilter;
+  const isTennis=type==='tennis';
+  const selectMode=type==='fitness'?fitnessSelectMode:tennisSelectMode;
+  const selected=type==='fitness'?fitnessSelected:tennisSelected;
+  const cats=['All',...new Set(videos.map(v=>v.cat))];
+
+  document.getElementById(type==='fitness'?'fitnessFilters':'tennisFilters').innerHTML=
     cats.map(c=>`<button class="filter-pill ${isTennis?'tennis-pill':''} ${activeFilter===c?'active':''}" onclick="setFilter('${type}','${c}')">${c}</button>`).join('');
-  const search = document.getElementById(type==='fitness'?'fitnessSearch':'tennisSearch').value.toLowerCase();
-  let filtered = videos;
-  if(activeFilter!=='All') filtered=filtered.filter(v=>v.cat===activeFilter);
-  if(search) filtered=filtered.filter(v=>v.title.toLowerCase().includes(search)||(v.notes||'').toLowerCase().includes(search));
-  const listId = type==='fitness'?'fitnessVideoList':'tennisVideoList';
-  const container = document.getElementById(listId);
+
+  const bulkBar=document.getElementById(type==='fitness'?'fitnessBulkBar':'tennisBulkBar');
+  const bulkCount=document.getElementById(type==='fitness'?'fitnessBulkCount':'tennisBulkCount');
+  if(selectMode){bulkBar.classList.add('visible');bulkCount.textContent=selected.length+' selected';}
+  else{bulkBar.classList.remove('visible');}
+
+  const search=document.getElementById(type==='fitness'?'fitnessSearch':'tennisSearch').value.toLowerCase();
+  let filtered=videos;
+  if(activeFilter!=='All')filtered=filtered.filter(v=>v.cat===activeFilter);
+  if(search)filtered=filtered.filter(v=>v.title.toLowerCase().includes(search)||(v.notes||'').toLowerCase().includes(search));
+
+  const container=document.getElementById(type==='fitness'?'fitnessVideoList':'tennisVideoList');
+  container.className=selectMode?'select-mode':'';
+
   if(!videos.length){container.innerHTML=`<div class="empty-state"><div class="empty-icon">${isTennis?'🎾':'🎬'}</div><div class="empty-title">No videos yet</div><div class="empty-sub">Paste links from Instagram, TikTok, YouTube and more.</div></div>`;return;}
   if(!filtered.length){container.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No results</div></div>`;return;}
-  container.innerHTML = filtered.map(v=>{
+
+  container.innerHTML=filtered.map(v=>{
     const p=getPlatform(v.url);
     const ythumb=p==='youtube'?getYoutubeThumbnail(v.url):null;
-    return`<div class="video-card ${isTennis?'tennis-card':''}">
-      <div class="video-card-top" onclick="openViewer('${v.id}','${type}')" style="cursor:pointer;">
+    const isSelected=selected.includes(v.id);
+    return`<div class="video-card ${isTennis?'tennis-card':''} ${isSelected?'selected-card':''}" id="vc_${v.id}">
+      <div class="video-card-top" onclick="${selectMode?`toggleSelectVideo('${type}','${v.id}')`:`openViewer('${v.id}','${type}')`}">
+        <div class="video-checkbox ${isSelected?'checked':''}" onclick="event.stopPropagation();toggleSelectVideo('${type}','${v.id}')">
+          ${isSelected?'<svg width="11" height="11" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>':''}
+        </div>
         <div class="video-thumbnail">
-          ${ythumb?`<img src="${ythumb}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`:`<span>${getPlatformEmoji(p)}</span>`}
+          ${ythumb?`<img src="${ythumb}">`:`<span>${getPlatformEmoji(p)}</span>`}
         </div>
         <div class="video-info">
           <div class="video-title">${v.title}</div>
@@ -460,12 +492,12 @@ function renderVideos(type) {
       </div>
       <div class="video-card-actions">
         <button class="card-action-btn fav-btn ${v.favourite?'active':''}" onclick="toggleFav('${type}','${v.id}')">
-          ${v.favourite?'⭐ Saved':'☆ Save'}
+          ${v.favourite?'⭐ Favourited':'☆ Favourite'}
         </button>
         <button class="card-action-btn" onclick="copyLink('${v.url}')">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy
         </button>
-        <button class="card-action-btn danger" onclick="deleteVideo('${type}','${v.id}')">
+        <button class="card-action-btn" onclick="startSelectMode('${type}','${v.id}')">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/></svg>Delete
         </button>
       </div>
@@ -476,6 +508,36 @@ function renderVideos(type) {
 function setFilter(type,cat){if(type==='fitness')activeFitnessFilter=cat;else activeTennisFilter=cat;renderVideos(type);}
 function copyLink(url){navigator.clipboard.writeText(url).then(()=>toast('Link copied!')).catch(()=>toast('Could not copy'));}
 
+function startSelectMode(type,firstId){
+  if(type==='fitness'){fitnessSelectMode=true;if(!fitnessSelected.includes(firstId))fitnessSelected.push(firstId);}
+  else{tennisSelectMode=true;if(!tennisSelected.includes(firstId))tennisSelected.push(firstId);}
+  renderVideos(type);
+}
+
+function toggleSelectVideo(type,vid){
+  const arr=type==='fitness'?fitnessSelected:tennisSelected;
+  const idx=arr.indexOf(vid);
+  if(idx>=0)arr.splice(idx,1);else arr.push(vid);
+  renderVideos(type);
+}
+
+function cancelSelect(type){
+  if(type==='fitness'){fitnessSelectMode=false;fitnessSelected=[];}
+  else{tennisSelectMode=false;tennisSelected=[];}
+  renderVideos(type);
+}
+
+async function bulkDelete(type){
+  const selected=type==='fitness'?fitnessSelected:tennisSelected;
+  if(!selected.length){toast('Nothing selected');return;}
+  if(!confirm(`Delete ${selected.length} video(s)?`))return;
+  const table=type==='fitness'?'fitness_videos':'tennis_videos';
+  await db.from(table).delete().in('id',selected);
+  if(type==='fitness'){fitnessVideos=fitnessVideos.filter(v=>!selected.includes(v.id));fitnessSelectMode=false;fitnessSelected=[];}
+  else{tennisVideos=tennisVideos.filter(v=>!selected.includes(v.id));tennisSelectMode=false;tennisSelected=[];}
+  renderVideos(type);toast(`${selected.length} video(s) deleted`);
+}
+
 async function toggleFav(type,vid){
   const arr=type==='fitness'?fitnessVideos:tennisVideos;
   const v=arr.find(x=>x.id===vid);if(!v)return;
@@ -483,21 +545,12 @@ async function toggleFav(type,vid){
   const table=type==='fitness'?'fitness_videos':'tennis_videos';
   await db.from(table).update({favourite:v.favourite}).eq('id',vid);
   renderVideos(type);
-  toast(v.favourite?'Added to favourites ⭐':'Removed from favourites');
-}
-
-async function deleteVideo(type,vid){
-  if(!confirm('Delete this video?'))return;
-  const table=type==='fitness'?'fitness_videos':'tennis_videos';
-  await db.from(table).delete().eq('id',vid);
-  if(type==='fitness')fitnessVideos=fitnessVideos.filter(v=>v.id!==vid);
-  else tennisVideos=tennisVideos.filter(v=>v.id!==vid);
-  renderVideos(type);toast('Video deleted');
+  toast(v.favourite?'Added to Favourites ⭐':'Removed from Favourites');
 }
 
 // VIDEO MODAL
 function openVideoModal(type,editId){
-  editVideoType=type; editVideoId=editId||null;
+  editVideoType=type;editVideoId=editId||null;
   const isTennis=type==='tennis';
   document.getElementById('videoModalTitle').textContent=(editId?'Edit':'Add')+' '+(isTennis?'Tennis':'Fitness')+' Video';
   document.getElementById('videoSaveBtn').className='btn-save'+(isTennis?' tennis':'');
@@ -533,8 +586,7 @@ async function saveVideo(){
     await db.from(table).update(data).eq('id',editVideoId);
     toast('Video updated!');
   } else {
-    const newId=uid();
-    await db.from(table).insert([{id:newId,favourite:false,...data}]);
+    await db.from(table).insert([{id:uid(),favourite:false,...data}]);
     toast('Video saved!');
   }
   closeVideoModal();
@@ -547,7 +599,7 @@ function renderRoutines(){
   if(!routines.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No exercises yet</div><div class="empty-sub">Add exercises, assign them to days, and link a video.</div></div>`;return;}
   const byDay={};DAYS.forEach(d=>{byDay[d]=[];});const noDays=[];
   routines.forEach(r=>{
-    const days=r.days?r.days.split(','):[];
+    const days=r.days?r.days.split(',').filter(Boolean):[];
     if(!days.length)noDays.push(r);
     else days.forEach(d=>{if(byDay[d])byDay[d].push(r);});
   });
@@ -567,7 +619,7 @@ function routineCardHTML(r){
   const video=r.video_id?allVids.find(v=>v.id===r.video_id):null;
   const p=video?getPlatform(video.url):null;
   const vtype=video?(fitnessVideos.find(v=>v.id===video.id)?'fitness':'tennis'):null;
-  const days=r.days?r.days.split(','):[];
+  const days=r.days?r.days.split(',').filter(Boolean):[];
   return`<div class="routine-card">
     <div class="routine-info">
       <div class="routine-name">${r.name}</div>
@@ -593,9 +645,8 @@ async function deleteRoutine(rid){
   renderRoutines();toast('Exercise deleted');
 }
 
-// ROUTINE MODAL
 function openRoutineModal(editId){
-  editRoutineId=editId||null; selectedRoutineVideo=null; selectedDays=[];
+  editRoutineId=editId||null;selectedRoutineVideo=null;selectedDays=[];
   document.getElementById('dayPills').innerHTML=DAYS.map(d=>`<button class="day-pill" id="pill_${d}" onclick="toggleDay('${d}')">${d}</button>`).join('');
   const allVids=[...fitnessVideos,...tennisVideos];
   const vList=document.getElementById('videoSelectList');
@@ -619,7 +670,7 @@ function openRoutineModal(editId){
     document.getElementById('rSets').value=r.sets||'';
     document.getElementById('rReps').value=r.reps||'';
     document.getElementById('rNotes').value=r.notes||'';
-    selectedDays=r.days?r.days.split(','):[];
+    selectedDays=r.days?r.days.split(',').filter(Boolean):[];
     selectedDays.forEach(d=>{const p=document.getElementById('pill_'+d);if(p)p.classList.add('active');});
     if(r.video_id)selectRoutineVideo(r.video_id);
     document.getElementById('routineModalTitle').textContent='Edit Exercise';
@@ -656,7 +707,7 @@ function renderFavourites(){
   const c=document.getElementById('favouritesList');
   const favFitness=fitnessVideos.filter(v=>v.favourite);
   const favTennis=tennisVideos.filter(v=>v.favourite);
-  if(!favFitness.length&&!favTennis.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">No favourites yet</div><div class="empty-sub">Tap ☆ Save on any video to add it here.</div></div>`;return;}
+  if(!favFitness.length&&!favTennis.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">No favourites yet</div><div class="empty-sub">Tap ☆ Favourite on any video to add it here.</div></div>`;return;}
   let html='';
   if(favFitness.length){html+=`<div class="fav-section"><div class="fav-section-label fitness-fav">💪 Fitness</div>`;html+=favFitness.map(v=>favCardHTML(v,'fitness')).join('');html+='</div>';}
   if(favTennis.length){html+=`<div class="fav-section"><div class="fav-section-label tennis-fav">🎾 Tennis</div>`;html+=favTennis.map(v=>favCardHTML(v,'tennis')).join('');html+='</div>';}
@@ -667,8 +718,8 @@ function favCardHTML(v,type){
   const p=getPlatform(v.url);
   const ythumb=p==='youtube'?getYoutubeThumbnail(v.url):null;
   return`<div class="video-card ${type==='tennis'?'tennis-card':''}">
-    <div class="video-card-top" onclick="openViewer('${v.id}','${type}')" style="cursor:pointer;">
-      <div class="video-thumbnail">${ythumb?`<img src="${ythumb}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`:`<span>${getPlatformEmoji(p)}</span>`}</div>
+    <div class="video-card-top" onclick="openViewer('${v.id}','${type}')">
+      <div class="video-thumbnail">${ythumb?`<img src="${ythumb}">`:`<span>${getPlatformEmoji(p)}</span>`}</div>
       <div class="video-info">
         <div class="video-title">${v.title}</div>
         <div class="video-meta"><span class="platform-badge badge-${p}">${getPlatformLabel(p)}</span><span class="video-cat">${v.cat}</span></div>
@@ -676,7 +727,7 @@ function favCardHTML(v,type){
       </div>
     </div>
     <div class="video-card-actions">
-      <button class="card-action-btn fav-btn active" onclick="toggleFav('${type}','${v.id}');renderFavourites()">⭐ Remove</button>
+      <button class="card-action-btn fav-btn active" onclick="toggleFav('${type}','${v.id}');setTimeout(renderFavourites,300)">⭐ Remove</button>
       <button class="card-action-btn" onclick="copyLink('${v.url}')">Copy Link</button>
     </div>
   </div>`;
